@@ -1,21 +1,34 @@
 module.exports = patch;
 
 function patch ({ parent, newVirtualNode, element, oldVirtualNode }) {
-    if (oldVirtualNode) {
-        removeExcessiveChildren(oldVirtualNode, newVirtualNode, element);
-        if (oldVirtualNode.tag == newVirtualNode.tag) {
-            return updateElementData(newVirtualNode, oldVirtualNode, element);
-        } else {
-            const newElement = createElement(newVirtualNode);
-            parent.replaceChild(newElement, element);
-            return newElement
-        }
+    if (oldVirtualNode == null) {
+        const newElement = createElement(newVirtualNode);
+        return parent.appendChild(newElement);
+    } else if (oldVirtualNode.tag && oldVirtualNode.tag === newVirtualNode.tag) {
+        updateElementData({ newVirtualNode, oldVirtualNode, element })
+        removeExcessiveChildren({ oldVirtualNode, newVirtualNode, element });
+        patchMatchingChildren({ element, newVirtualNode, oldVirtualNode })
+        return element;
+    } else if (oldVirtualNode !== newVirtualNode) {
+        const newElement = createElement(newVirtualNode);
+        parent.replaceChild(newElement, element);
+        return newElement;
     }
-    const newElement = createElement(newVirtualNode);
-    return parent.appendChild(newElement);
+
 };
 
-function updateElementData (newVirtualNode, oldVirtualNode, element) {
+function patchMatchingChildren ({ element, oldVirtualNode, newVirtualNode }) {
+    newVirtualNode.children.forEach((child, idx) => {
+        patch({
+            parent: element,
+            element: element.childNodes[idx],
+            oldVirtualNode: oldVirtualNode.children[idx],
+            newVirtualNode: child
+        })
+    });
+};
+
+function updateElementData ({ newVirtualNode, oldVirtualNode, element }) {
     for (let attr in newVirtualNode.data) {
         if (newVirtualNode.data[attr] !== oldVirtualNode.data[attr]) {
             element.setAttribute(attr, newVirtualNode.data[attr]);
@@ -30,7 +43,7 @@ function updateElementData (newVirtualNode, oldVirtualNode, element) {
     return element;
 };
 
-function removeExcessiveChildren (oldVirtualNode, newVirtualNode, element) {
+function removeExcessiveChildren ({ oldVirtualNode, newVirtualNode, element }) {
     const childrenToRemove = [];
     for (let i = newVirtualNode.children.length; i < oldVirtualNode.children.length; ++i) {
         childrenToRemove.push(element.childNodes[i]);

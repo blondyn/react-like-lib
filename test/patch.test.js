@@ -130,20 +130,42 @@ test("should remove excess child nodes", t => {
 
     t.end();
 });
-//
-// test("patch matching children on update", t => {
-//     document.body.innerHTML = '<div><span id="foo"></span></div>';
-//     const oldChild = document.querySelector("span");
-//     patch({
-//         parent: document.body,
-//         element: document.querySelector("div"),
-//         oldVirtualNode: h("div", {}, [h("span", {id: "foo"})]),
-//         newVirtualNode: h("div", {}, [h("span", {id: "bar"})])
-//     });
-//     const newChild = document.querySelector("span");
-//
-//     t.strictEqual(document.body.innerHTML, '<div><span id="bar"></span></div>');
-//     t.strictEqual(oldChild, newChild);
-//
-//     t.end();
-// });
+
+test("patch matching children on update", t => {
+    document.body.innerHTML = '<div><span id="foo"></span></div>';
+    const oldChild = document.querySelector("span");
+    patch({
+        parent: document.body,
+        element: document.querySelector("div"),
+        oldVirtualNode: h("div", {}, [h("span", { id: "foo" })]),
+        newVirtualNode: h("div", {}, [h("span", { id: "bar" })])
+    });
+    const newChild = document.querySelector("span");
+
+    t.strictEqual(document.body.innerHTML, '<div><span id="bar"></span></div>');
+    t.strictEqual(oldChild, newChild);
+
+    t.end();
+});
+
+test("do not replace identical text element", t => {
+    // given
+    document.body.innerHTML = "foo";
+
+    // when
+    patch({
+        parent: {
+            replaceChild() {
+                throw new Error("should not call replaceChild");
+            }
+        },
+        element: document.body.childNodes[0],
+        oldVirtualNode: "foo",
+        newVirtualNode: "foo"
+    });
+
+    // then
+    t.strictEqual(document.body.innerHTML, "foo");
+
+    t.end();
+});
