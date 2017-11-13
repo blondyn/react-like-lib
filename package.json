@@ -1,0 +1,17 @@
+{
+  "name": "tdd-react-like-lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "hyperx": "^2.3.0",
+    "jsdom": "^11.1.0",
+    "jsdom-global": "^3.0.2",
+    "tape": "^4.8.0"
+  }
+}
