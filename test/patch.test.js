@@ -5,10 +5,10 @@ require("jsdom-global")();
 
 test("create new element", t => {
     document.body.innerHTML = "";
-    const newElement = patch({parent: document.body, newVirtualNode: h("div")});
+    const newElement = patch({parent: document.body, newVirtualNode: h("div", {id: "foo"})});
 
-    t.strictEqual(document.body.innerHTML, "<div></div>");
-    t.strictEqual(newElement.outerHTML, "<div></div>");
+    t.strictEqual(document.body.innerHTML, '<div id="foo"></div>');
+    t.strictEqual(newElement.outerHTML, '<div id="foo"></div>');
 
     t.end();
 });
@@ -19,6 +19,16 @@ test("create new text element", t => {
 
     t.strictEqual(document.body.innerHTML, "some text");
     t.strictEqual(newElement.textContent, "some text");
+
+    t.end();
+});
+
+test("create new element with children assigned", t => {
+    document.body.innerHTML = "";
+    const newElement = patch({parent: document.body, newVirtualNode: h("div", {id: 'foo'}, ["some text"])});
+
+    t.strictEqual(document.body.innerHTML, '<div id="foo">some text</div>');
+    t.strictEqual(newElement.outerHTML, '<div id="foo">some text</div>');
 
     t.end();
 });

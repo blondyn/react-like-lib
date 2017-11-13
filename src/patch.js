@@ -1,10 +1,17 @@
-module.exports = ({ parent, newVirtualNode })  => {
+module.exports = function patch ({ parent, newVirtualNode }) {
     let newElement;
-    if(newVirtualNode.tag) {
-        newElement = document.createElement(newVirtualNode.tag);
-    } else {
+    if (typeof newVirtualNode === 'string') {
         newElement = document.createTextNode(newVirtualNode)
+    } else {
+        newElement = document.createElement(newVirtualNode.tag);
+
+        Object.keys(newVirtualNode.data).forEach((key) => {
+            newElement.setAttribute(`${key}`, newVirtualNode.data[key])
+        });
+
+        newVirtualNode.children.forEach(child => {
+            patch({parent: newElement, newVirtualNode: child});
+        });
     }
-    parent.appendChild(newElement);
-    return newElement
+    return parent.appendChild(newElement);
 };
