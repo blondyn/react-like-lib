@@ -1,4 +1,19 @@
 const patch = require('./patch');
-module.exports = function (newVirtualNode) {
-    return patch({ parent: document.body, element: null, oldVirtualNode: null, newVirtualNode });
-};
+
+function renderer() {
+
+    let element = null;
+    let oldVirtualNode = null;
+
+    function render(newVirtualNode) {
+        const patchedElement = patch({ parent: document.body, element, oldVirtualNode, newVirtualNode });
+        element = patchedElement;
+        oldVirtualNode = newVirtualNode;
+        return patchedElement;
+    }
+
+    return render;
+
+}
+
+module.exports = renderer;
